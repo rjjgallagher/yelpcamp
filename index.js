@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const ejsMateEngine = require('ejs-mate');
-const catchAsync = require('./utilites/catchAsync');
+const catchAsync = require('./utilities/catchAsync');
 const methodOverride = require('method-override');
 const Campground = require('./models/campground');
 
@@ -69,6 +69,10 @@ app.get('/makecampground', catchAsync(async (req, res) => {
     await camp.save();
     res.send(camp);
 }));
+
+app.all('*', (res, req, next) => {
+    res.send("404!!!!");
+})
 
 app.use((err, req, res, next) => {
     res.send('Oh boy, something went wrong!');
