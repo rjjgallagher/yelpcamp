@@ -5,6 +5,8 @@ const express = require('express');
 const session = require('express-session');
 const methodOverride = require('method-override');
 const ejsMateEngine = require('ejs-mate');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
 
 const ExpressError = require('./utilities/ExpressError');
 
@@ -40,8 +42,20 @@ const sessionConfig = {
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
 }
+
 app.use(session(sessionConfig));
 app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+/**
+ * Middleware to initialize Passport and manage user sessions.
+ * This sets up Passport to use the local strategy for authentication,
+ * using the `authenticate` method provided by the User model.
+ */
+passport.use(new LocalStrategy(User.authenticate()));
+// These methods are provided by the passport-local-mongoose plugin
+passport.serializeUser(User.serializeUser()); // How to store a user in the session
+passport.deserializeUser(User.deserializeUser()); // How to get a user out of the session
 
 app.use((req, res, next) => {
     res.locals.success = req.flash('success');
