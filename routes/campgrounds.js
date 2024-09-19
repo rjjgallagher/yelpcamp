@@ -47,12 +47,20 @@ router.post('/', validateCampground, catchAsync(async (req, res, next) => {
 // GET route to display details of a specific campground by ID (Show Page)
 router.get('/:id', catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id).populate('reviews');  // Find campground by ID and populate reviews
+    if(!campground) {
+        req.flash('error', 'Can\'t fnd that campground!');
+        return res.redirect('/campgrounds');
+    }
     res.render('campgrounds/show', { campground });  // Render the show page for the campground
 }));
 
 // GET route to render the edit form for a specific campground by ID
 router.get('/:id/edit', catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);  // Find campground by ID
+    if(!campground) {
+        req.flash('error', 'Can\'t fnd that campground!');
+        return res.redirect('/campgrounds');
+    }
     res.render('campgrounds/edit', { campground });  // Render the edit form for the campground
 }));
 
