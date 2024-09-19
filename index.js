@@ -7,9 +7,11 @@ const methodOverride = require('method-override');
 const ejsMateEngine = require('ejs-mate');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
+const User = require('./models/user');
 
 const ExpressError = require('./utilities/ExpressError');
 
+const userRoutes = require('./routes/users.js');
 const campgroundRoutes = require('./routes/campgrounds.js');
 const reviewsRoutes = require('./routes/reviews.js');
 
@@ -45,6 +47,7 @@ const sessionConfig = {
 
 app.use(session(sessionConfig));
 app.use(flash());
+
 app.use(passport.initialize());
 app.use(passport.session());
 /**
@@ -63,6 +66,7 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use('/', userRoutes);
 app.use('/campgrounds', campgroundRoutes);
 app.use('/campgrounds/:id/reviews', reviewsRoutes);
 
