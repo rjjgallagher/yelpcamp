@@ -2,18 +2,20 @@ const express = require('express');
 const Campground = require('../models/campground');
 const Review = require('../models/review');
 const catchAsync = require('../utilities/catchAsync');
-const { validateReview } = require('../middleware');
+const { validateReview, isLoggedIn } = require('../middleware');
 
 const router = express.Router({ mergeParams: true });
 
 
-router.post('/', validateReview, catchAsync(async (req, res) => {
+router.post('/', isLoggedIn, validateReview, catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     const review = new Review(req.body.review);
+    // Passport.js adds the user property to req after successful authentication
+    review.author = req.user._id; // Set the author of the review to the current user 
     campground.reviews.push(review);
     await review.save();
     await campground.save();
-    req.flash('success', 'Successfully created a review!'); // Flash a success message
+    req.flash('success', 'Successfully created a review!'); 
     res.redirect(`/campgrounds/${campground._id}`)
 }));
 

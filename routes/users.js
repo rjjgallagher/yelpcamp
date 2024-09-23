@@ -45,7 +45,7 @@ router.post('/login',
     // Now we can use res.locals.returnTo to redirect the user after login
     (req, res) => {
         req.flash('success', 'Welcome back!');
-        const redirectUrl = res.locals.returnTo || '/campgrounds'; // update this line to use res.locals.returnTo now
+        const redirectUrl = res.locals.returnTo || '/campgrounds'; // If returnTo is not set, redirect to /campgrounds
         res.redirect(redirectUrl);
     });
 

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const cities = require('./cities.js');
 const {places, descriptors} = require('./seedHelpers.js');
 const Campground = require('../models/campground.js');
+const Review = require('../models/review.js');
 
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp');
 
@@ -15,6 +16,7 @@ const sample = array => array[Math.floor(Math.random() * array.length)];
 
 const seedDB = async() => {
     await Campground.deleteMany({});
+    await Review.deleteMany({});
     for(let i = 0; i < 50; i++) {
         const random1000 = Math.floor(Math.random() * 1000);
         const price = Math.floor(Math.random() * 25) + 10;

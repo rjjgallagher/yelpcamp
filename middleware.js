@@ -15,6 +15,10 @@ const Campground = require('./models/campground');
 
 // Middleware to check if the user is logged in
 module.exports.isLoggedIn = (req, res, next) => {
+    /*
+        isAuthenticated() is a method provided by Passport.js on the request object. 
+        It returns true if the user is authenticated, otherwise false.
+    */
     if (!req.isAuthenticated()) {
         req.session.returnTo = req.originalUrl;
         req.flash('error', 'You must be signed in to create a new campground!');

@@ -1,5 +1,3 @@
-// Importing the campground validation schema from schemas.js
-const { campgroundSchema } = require('../schemas.js');
 // Importing the Campground model to interact with the MongoDB database
 const Campground = require('../models/campground');
 // Importing middleware to secure application routes
@@ -30,6 +28,7 @@ router.get('/new', isLoggedIn, (req, res) => {
 // POST route for creating a new campground
 router.post('/', isLoggedIn, validateCampground, catchAsync(async (req, res, next) => {
     const campground = new Campground(req.body.campground);  // Create a new Campground object with the request data
+    // Passport.js adds the user property to req after successful authentication
     campground.author = req.user._id;  // Set the author of the campground to the current user
     await campground.save();  // Save the campground to the database
     req.flash('success', 'Successfully made a new campground!');  
