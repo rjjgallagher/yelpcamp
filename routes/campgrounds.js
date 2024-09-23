@@ -2,29 +2,15 @@
 const { campgroundSchema } = require('../schemas.js');
 // Importing the Campground model to interact with the MongoDB database
 const Campground = require('../models/campground');
-const isLoggedIn = require('../middleware').isLoggedIn;
-
-// Importing custom error handler (ExpressError) and async error catcher (catchAsync)
-const ExpressError = require('../utilities/ExpressError');
+// Importing middleware to secure application routes
+const { isLoggedIn, isAuthor, validateCampground } = require('../middleware');
+// Importing custom async error catcher (catchAsync)
 const catchAsync = require('../utilities/catchAsync');
 
 // Initializing the Express router
 const express = require('express');
 const router = express.Router();
 
-// Middleware to validate the campground request body before passing to route handlers
-const validateCampground = (req, res, next) => {
-    // Validating the request body using the campground schema
-    const { error } = campgroundSchema.validate(req.body);
-    
-    // If validation fails, create an error message from the details of the error
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',');
-        throw new ExpressError(msg, 400);  // Throw an error with the generated message and a 400 status code
-    } else {
-        next();  // If validation passes, proceed to the next middleware/route handler
-    }
-};
 
 // GET route for displaying all campgrounds (Index Page)
 router.get('/', catchAsync(async (req, res) => {
@@ -46,7 +32,7 @@ router.post('/', isLoggedIn, validateCampground, catchAsync(async (req, res, nex
     const campground = new Campground(req.body.campground);  // Create a new Campground object with the request data
     campground.author = req.user._id;  // Set the author of the campground to the current user
     await campground.save();  // Save the campground to the database
-    req.flash('success', 'Successfully made a new campground!');  // Flash a success message
+    req.flash('success', 'Successfully made a new campground!');  
     res.redirect(`/campgrounds/${campground._id}`);  // Redirect to the newly created campground's show page
 }));
 
@@ -62,8 +48,9 @@ router.get('/:id', catchAsync(async (req, res) => {
 }));
 
 // GET route to render the edit form for a specific campground by ID
-router.get('/:id/edit', isLoggedIn, catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);  // Find campground by ID
+router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const campground = await Campground.findById(id);  // Find campground by ID
     if(!campground) {
         req.flash('error', 'Can\'t fnd that campground!');
         return res.redirect('/campgrounds');
@@ -72,18 +59,18 @@ router.get('/:id/edit', isLoggedIn, catchAsync(async (req, res) => {
 }));
 
 // PUT route to update a specific campground by ID
-router.put('/:id', isLoggedIn, validateCampground, catchAsync(async (req, res) => {
+router.put('/:id', isLoggedIn, isAuthor, validateCampground, catchAsync(async (req, res) => {
     const { id } = req.params;
     // Find the campground by ID and update it with the new data from the request body
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground }, { new: true });
-    req.flash('success', `Successfully updated ${ campground.title }!`) // Flash a success message
+    req.flash('success', `Successfully updated ${ campground.title }!`) 
     res.redirect(`/campgrounds/${campground._id}`);  // Redirect to the updated campground's show page
 }));
 
 // DELETE route to remove a specific campground by ID
-router.delete('/:id', isLoggedIn, catchAsync(async (req, res) => {
+router.delete('/:id', isLoggedIn, isAuthor, catchAsync(async (req, res) => {
     const { id } = req.params;
-    await Campground.findByIdAndDelete(id);  // Find and delete the campground by ID
+    await Campground.findByIdAndDelete(id); 
     req.flash('success', 'Successfully deleted the campground!');
     res.redirect('/campgrounds');  // Redirect back to the campgrounds index page
 }));
