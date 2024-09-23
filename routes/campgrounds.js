@@ -44,6 +44,7 @@ router.get('/new', isLoggedIn, (req, res) => {
 // POST route for creating a new campground
 router.post('/', isLoggedIn, validateCampground, catchAsync(async (req, res, next) => {
     const campground = new Campground(req.body.campground);  // Create a new Campground object with the request data
+    campground.author = req.user._id;  // Set the author of the campground to the current user
     await campground.save();  // Save the campground to the database
     req.flash('success', 'Successfully made a new campground!');  // Flash a success message
     res.redirect(`/campgrounds/${campground._id}`);  // Redirect to the newly created campground's show page
@@ -51,7 +52,8 @@ router.post('/', isLoggedIn, validateCampground, catchAsync(async (req, res, nex
 
 // GET route to display details of a specific campground by ID (Show Page)
 router.get('/:id', catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id).populate('reviews');  // Find campground by ID and populate reviews
+    const campground = await Campground.findById(req.params.id).populate('reviews').populate('author');  // Find campground by ID and populate reviews
+    console.log(campground);
     if(!campground) {
         req.flash('error', 'Can\'t fnd that campground!');
         return res.redirect('/campgrounds');
