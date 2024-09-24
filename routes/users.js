@@ -1,3 +1,9 @@
+const express = require('express');
+const router = express.Router();
+const passport = require('passport');
+const catchAsync = require('../utilities/catchAsync');
+const { storeReturnTo } = require('../middleware');
+const authController = require('../controllers/auth');
 /**
  * @fileoverview Routes for user authentication and registration.
  * 
@@ -7,12 +13,7 @@
  * 
  * @module routes/users
  */
-const express = require('express');
-const router = express.Router();
-const passport = require('passport');
-const catchAsync = require('../utilities/catchAsync');
-const { storeReturnTo } = require('../middleware');
-const authController = require('../controllers/auth');
+
 
 /**
 * GET /register
