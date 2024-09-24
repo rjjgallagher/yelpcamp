@@ -1,30 +1,44 @@
 const express = require('express');
-const Campground = require('../models/campground');
-const Review = require('../models/review');
 const catchAsync = require('../utilities/catchAsync');
 const { validateReview, isLoggedIn, isReviewAuthor } = require('../middleware');
+const reviewController = require('../controllers/reviews');
 
+// Initialize a new Express router with the mergeParams option set to true.
+// This allows the router to access parameters from its parent router, which is useful
+// for handling nested routes, such as accessing the campgroundId in routes like
+// /campgrounds/:campgroundId/reviews.
 const router = express.Router({ mergeParams: true });
 
+/**
+ * Route handler for creating a new review for a campground.
+ * 
+ * This route is protected by authentication and validation middleware.
+ * It handles the creation of a new review, associates it with the current user,
+ * and links it to the specified campground. After saving the review and the campground,
+ * it flashes a success message and redirects the user to the campground's detail page.
+ * 
+ * Middleware:
+ * - isLoggedIn: Ensures the user is authenticated.
+ * - validateReview: Validates the review data in the request body.
+ * - catchAsync: Catches and handles any errors that occur during the asynchronous operations.
+ */
+router.post('/', isLoggedIn, validateReview, catchAsync(reviewController.createReview));
 
-router.post('/', isLoggedIn, validateReview, catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
-    const review = new Review(req.body.review);
-    // Passport.js adds the user property to req after successful authentication
-    review.author = req.user._id; // Set the author of the review to the current user 
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-    req.flash('success', 'Successfully created a review!'); 
-    res.redirect(`/campgrounds/${campground._id}`)
-}));
-
-router.delete('/:reviewId', isLoggedIn, isReviewAuthor, catchAsync(async (req, res) => {
-    const { id, reviewId } = req.params;
-    Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
-    await Review.findByIdAndDelete(reviewId);
-    req.flash('success', 'Successfully deleted the review!');
-    res.redirect(`/campgrounds/${id}`);
-}));
+/**
+ * Route handler for deleting a specific review.
+ * 
+ * This route is protected by authentication and authorization middleware.
+ * It handles the deletion of a review identified by the reviewId parameter.
+ * The user must be logged in and must be the author of the review to delete it.
+ * 
+ * Middleware:
+ * - isLoggedIn: Ensures the user is authenticated.
+ * - isReviewAuthor: Ensures the user is the author of the review.
+ * - catchAsync: Catches and handles any errors that occur during the asynchronous operations.
+ * 
+ * Controller:
+ * - reviewController.deleteReview: Handles the actual deletion logic.
+ */
+router.delete('/:reviewId', isLoggedIn, isReviewAuthor, catchAsync(reviewController.deleteReview));
 
 module.exports = router;
