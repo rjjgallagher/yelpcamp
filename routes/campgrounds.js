@@ -2,6 +2,9 @@ const express = require('express');
 const { isLoggedIn, isAuthor, validateCampground } = require('../middleware');
 const catchAsync = require('../utilities/catchAsync');
 const campgroundController = require('../controllers/campgrounds');
+const multer = require('multer');
+const { storage } = require('../cloudinary');
+const upload = multer({ storage });
 
 // Initializing the Express router
 const router = express.Router();
@@ -10,7 +13,11 @@ router.route('/')
     // GET route for displaying all campgrounds (Index Page)
     .get(catchAsync(campgroundController.index))
     // POST route for creating a new campground
-    .post(isLoggedIn, validateCampground, catchAsync(campgroundController.createCampground));
+    //.post(isLoggedIn, validateCampground, catchAsync(campgroundController.createCampground));
+    .post(upload.array('image'), (req, res) => {
+        console.log(req.body, req.files);
+        res.send('It worked!');
+    })
 
 // GET route to render the form for creating a new campground
 router.get('/new', isLoggedIn, campgroundController.renderNewForm);
