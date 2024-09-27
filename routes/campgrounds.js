@@ -9,15 +9,17 @@ const upload = multer({ storage });
 // Initializing the Express router
 const router = express.Router();
 
+//NOTE: important detail on upload.array being before validateCampground in video '553. Storing Uploaded IMage Links in Mongo' in webdev course @ 7.15
 router.route('/')
     // GET route for displaying all campgrounds (Index Page)
     .get(catchAsync(campgroundController.index))
     // POST route for creating a new campground
-    //.post(isLoggedIn, validateCampground, catchAsync(campgroundController.createCampground));
-    .post(upload.array('image'), (req, res) => {
-        console.log(req.body, req.files);
-        res.send('It worked!');
-    })
+    // Middleware sequence:
+    // 1. isLoggedIn: Ensures the user is authenticated.
+    // 2. validateCampground: Validates the campground data in the request body.
+    // 3. upload.array('image'): Handles the file upload for images, allowing multiple images to be uploaded.
+    // 4. catchAsync(campgroundController.createCampground): Handles the creation of the campground.
+    .post(isLoggedIn, upload.array('image'), validateCampground, catchAsync(campgroundController.createCampground));
 
 // GET route to render the form for creating a new campground
 router.get('/new', isLoggedIn, campgroundController.renderNewForm);

@@ -16,8 +16,10 @@ module.exports.renderNewForm = (req, res) => {
 module.exports.createCampground = async (req, res, next) => {
     const campground = new Campground(req.body.campground);  // Create a new Campground object with the request data
     // Passport.js adds the user property to req after successful authentication
+    campground.images = req.files.map(f => ({url: f.path, filename: f.filename}));  // Map the uploaded files to an array of objects
     campground.author = req.user._id;  // Set the author of the campground to the current user
     await campground.save();  // Save the campground to the database
+    console.log(campground);
     req.flash('success', 'Successfully made a new campground!');  
     res.redirect(`/campgrounds/${campground._id}`);  // Redirect to the newly created campground's show page
 };
