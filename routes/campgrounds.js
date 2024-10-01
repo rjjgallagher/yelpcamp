@@ -28,7 +28,7 @@ router.route('/:id')
     // GET route to display details of a specific campground by ID (Show Page)
     .get(catchAsync(campgroundController.showCampground))
     // PUT route to update a specific campground by ID
-    .put(isLoggedIn, isAuthor, validateCampground, catchAsync(campgroundController.updateCampground))
+    .put(isLoggedIn, isAuthor, upload.array('image'), validateCampground, catchAsync(campgroundController.updateCampground))
     // DELETE route to remove a specific campground by ID
     .delete(isLoggedIn, isAuthor, catchAsync(campgroundController.deleteCampground));
 
