@@ -51,6 +51,7 @@ module.exports.renderEditForm = async (req, res) => {
 
 module.exports.updateCampground = async (req, res) => {
     const { id } = req.params;
+    console.log(req.body);
     // Find the campground by ID and update it with the new data from the request body
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground }, { new: true });
     const imgs = req.files.map(f => ({url: f.path, filename: f.filename}));  // Map the uploaded files to an array of objects
