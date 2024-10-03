@@ -4,6 +4,7 @@ const {places, descriptors} = require('./seedHelpers.js');
 const Campground = require('../models/campground.js');
 const Review = require('../models/review.js');
 
+//const db_Url = process.env.DB_URL;
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp');
 
 const db = mongoose.connection;
