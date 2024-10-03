@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-md-4">
                 <% if (campground.images && campground.images.length > 0) { %>
-                <img class="img-fluid" alt="" src="<%= campground.images[0].url %>">
+                <img class="img-fluid" alt="" src="<%= campground.images[0].url %>" crossorigin="anonymous">
                 <% } else { %>
                 <img class="img-fluid" alt="No image available" src="/images/default.jpg">
                 <% } %>            

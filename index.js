@@ -12,6 +12,7 @@ const ejsMateEngine = require('ejs-mate');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const mongoSantitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
 
 const User = require('./models/user');
 
@@ -73,6 +74,7 @@ const styleSrcUrls = [
     "https://api.tiles.mapbox.com/",
     "https://fonts.googleapis.com/",
     "https://use.fontawesome.com/",
+    "https://cdn.jsdelivr.net"
 ];
 const connectSrcUrls = [
     "https://api.mapbox.com/",
