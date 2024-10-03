@@ -11,6 +11,8 @@ const methodOverride = require('method-override');
 const ejsMateEngine = require('ejs-mate');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
+const mongoSantitize = require('express-mongo-sanitize');
+
 const User = require('./models/user');
 
 const ExpressError = require('./utilities/ExpressError');
@@ -37,6 +39,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(mongoSantitize());
 
 const sessionConfig = {
     secret: 'thisshouldbeabettersecret',
@@ -65,6 +68,7 @@ passport.serializeUser(User.serializeUser()); // How to store a user in the sess
 passport.deserializeUser(User.deserializeUser()); // How to get a user out of the session
 
 app.use((req, res, next) => {
+    console.log(req.query);
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
